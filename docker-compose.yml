@@ -10,7 +10,7 @@ services:
     volumes:
       - user-service-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,9 +29,44 @@ services:
     networks:
       - ecommerce-network
 
+  product-service-db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=product_service_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - product-service-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ecommerce-network
+
+  product-service:
+    build:
+      context: ./services/product-service
+      dockerfile: Dockerfile
+    ports:
+      - "50052:50052"
+    depends_on:
+      product-service-db:
+        condition: service_healthy
+    environment:
+      - DB_SOURCE=postgres://postgres:postgres@product-service-db:5432/product_service_db?sslmode=disable
+      - PORT=50052
+    networks:
+      - ecommerce-network
+
 volumes:
   user-service-db-data:
+  product-service-db-data:
+
 
 networks:
   ecommerce-network:
-  
+    driver: bridge

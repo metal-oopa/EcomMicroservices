@@ -11,7 +11,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	_ "github.com/lib/pq"
-	"github.com/metal-oopa/distributed-ecommerce/services/user-service/github.com/metal-oopa/distributed-ecommerce/services/user-service/userpb"
+	"github.com/metal-oopa/distributed-ecommerce/services/user-service/userpb"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

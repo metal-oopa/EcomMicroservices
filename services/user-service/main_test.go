@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/metal-oopa/distributed-ecommerce/services/user-service/github.com/metal-oopa/distributed-ecommerce/services/user-service/userpb"
+	"github.com/metal-oopa/distributed-ecommerce/services/user-service/userpb"
 )
 
 func TestRegisterUser(t *testing.T) {
