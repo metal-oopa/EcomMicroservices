@@ -18,21 +18,21 @@ services:
       - ecommerce-network
 
   user-service:
-      build:
-        context: ./services/user-service
-        dockerfile: Dockerfile
-      ports:
-        - "50051:50051"
-      depends_on:
-        user-service-db:
-          condition: service_healthy
-      environment:
-        - DB_SOURCE=postgres://postgres:postgres@user-service-db:5432/user_service_db?sslmode=disable
-        - PORT=50051
-        - JWT_SECRET_KEY=secret
-        - TOKEN_DURATION=24h
-      networks:
-        - ecommerce-network
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    depends_on:
+      user-service-db:
+        condition: service_healthy
+    environment:
+      - DB_SOURCE=postgres://postgres:postgres@user-service-db:5432/user_service_db?sslmode=disable
+      - PORT=50051
+      - JWT_SECRET_KEY=secret
+      - TOKEN_DURATION=24h
+    networks:
+      - ecommerce-network
 
   product-service-db:
     image: postgres:latest
@@ -45,7 +45,7 @@ services:
     volumes:
       - product-service-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -67,10 +67,44 @@ services:
     networks:
       - ecommerce-network
 
+  cart-service-db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=cart_service_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - cart-service-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ecommerce-network
+
+  cart-service:
+    build:
+      context: ./services/cart-service
+      dockerfile: Dockerfile
+    ports:
+      - "50053:50053"
+    depends_on:
+      cart-service-db:
+        condition: service_healthy
+    environment:
+      - DB_SOURCE=postgres://postgres:postgres@cart-service-db:5432/cart_service_db?sslmode=disable
+      - PORT=50053
+      - JWT_SECRET_KEY=your-very-secure-secret-key
+    networks:
+      - ecommerce-network
+
 volumes:
   user-service-db-data:
   product-service-db-data:
-
+  cart-service-db-data:
 
 networks:
   ecommerce-network:
