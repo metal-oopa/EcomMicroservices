@@ -1,4 +1,6 @@
-FROM golang:1.23.2-alpine3.20
+FROM golang:1.23.2-alpine3.20 AS builder
+
+RUN apk update && apk add --no-cache git
 
 WORKDIR /app
 
@@ -8,7 +10,13 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-RUN go build -o user-service .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o user-service ./cmd/server/main.go
+
+FROM alpine:latest
+
+WORKDIR /root/
+
+COPY --from=builder /app/user-service .
 
 EXPOSE 50051
 

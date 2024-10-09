@@ -10,6 +10,12 @@ service UserService {
   rpc GetUserProfile(GetUserProfileRequest) returns (GetUserProfileResponse);
 }
 
+message User {
+  string user_id = 1;
+  string username = 2;
+  string email = 3;
+}
+
 message RegisterUserRequest {
   string username = 1;
   string email = 2;
@@ -17,7 +23,7 @@ message RegisterUserRequest {
 }
 
 message RegisterUserResponse {
-  string user_id = 1;
+  User user = 1;
 }
 
 message LoginUserRequest {
@@ -34,7 +40,5 @@ message GetUserProfileRequest {
 }
 
 message GetUserProfileResponse {
-  string user_id = 1;
-  string username = 2;
-  string email = 3;
+  User user = 1;
 }

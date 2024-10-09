@@ -1,10 +1,12 @@
-package main
+package handlers
 
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/metal-oopa/distributed-ecommerce/services/user-service/repository"
 	"github.com/metal-oopa/distributed-ecommerce/services/user-service/userpb"
 )
 
@@ -15,11 +17,12 @@ func TestRegisterUser(t *testing.T) {
 	}
 	defer db.Close()
 
-	s := &server{db: db}
-
 	mock.ExpectQuery("INSERT INTO users").
 		WithArgs("testuser", "test@example.com", sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows([]string{"user_id"}).AddRow(1))
+
+	repo := repository.NewUserRepository(db)
+	handler := NewUserServiceServer(repo, "test-secret-key", 24*time.Hour)
 
 	req := &userpb.RegisterUserRequest{
 		Username: "testuser",
@@ -27,14 +30,14 @@ func TestRegisterUser(t *testing.T) {
 		Password: "password123",
 	}
 
-	resp, err := s.RegisterUser(context.Background(), req)
+	resp, err := handler.RegisterUser(context.Background(), req)
 	if err != nil {
 		t.Errorf("RegisterUser failed: %v", err)
 	}
-	if resp.UserId != "1" {
-		t.Errorf("Expected UserId '1', got '%s'", resp.UserId)
-	}
 
+	if resp.User.UserId != "1" {
+		t.Errorf("Expected UserId '1', got '%s'", resp.User.UserId)
+	}
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("Unfulfilled expectations: %v", err)
 	}
