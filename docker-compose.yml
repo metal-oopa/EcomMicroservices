@@ -101,10 +101,47 @@ services:
     networks:
       - ecommerce-network
 
+  order-service-db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=order_service_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - order-service-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ecommerce-network
+
+  order-service:
+    build:
+      context: ./services/order-service
+      dockerfile: Dockerfile
+    ports:
+      - "50054:50054"
+    depends_on:
+      order-service-db:
+        condition: service_healthy
+    env_file:
+      - ./services/order-service/.env
+    environment:
+      - DB_SOURCE=postgres://postgres:postgres@order-service-db:5432/order_service_db?sslmode=disable
+      - PORT=50054
+      - JWT_SECRET_KEY=secure-secret-key
+    networks:
+      - ecommerce-network
+
 volumes:
   user-service-db-data:
   product-service-db-data:
   cart-service-db-data:
+  order-service-db-data:
 
 networks:
   ecommerce-network:
