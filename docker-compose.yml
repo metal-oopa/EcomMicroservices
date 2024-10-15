@@ -1,4 +1,21 @@
 services:
+  consul:
+    image: hashicorp/consul:1.19.0
+    container_name: consul
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    command: agent -server -bootstrap -ui -client=0.0.0.0
+    networks:
+      - ecommerce-network
+    volumes:
+      - consul-data:/consul/data
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   user-service-db:
     image: postgres:latest
     environment:
@@ -26,11 +43,10 @@ services:
     depends_on:
       user-service-db:
         condition: service_healthy
-    environment:
-      - DB_SOURCE=postgres://postgres:postgres@user-service-db:5432/user_service_db?sslmode=disable
-      - PORT=50051
-      - JWT_SECRET_KEY=secret
-      - TOKEN_DURATION=24h
+      consul:
+        condition: service_healthy
+    env_file:
+      - ./services/user-service/.env
     networks:
       - ecommerce-network
 
@@ -61,11 +77,17 @@ services:
     depends_on:
       product-service-db:
         condition: service_healthy
-    environment:
-      - DB_SOURCE=postgres://postgres:postgres@product-service-db:5432/product_service_db?sslmode=disable
-      - PORT=50052
+      consul:
+        condition: service_healthy
+    env_file:
+      - ./services/product-service/.env
     networks:
       - ecommerce-network
+    healthcheck:
+      test: ["CMD", "ping", "-c", "1", "product-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   cart-service-db:
     image: postgres:latest
@@ -94,10 +116,12 @@ services:
     depends_on:
       cart-service-db:
         condition: service_healthy
-    environment:
-      - DB_SOURCE=postgres://postgres:postgres@cart-service-db:5432/cart_service_db?sslmode=disable
-      - PORT=50053
-      - JWT_SECRET_KEY=your-very-secure-secret-key
+      consul:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
+    env_file:
+      - ./services/cart-service/.env
     networks:
       - ecommerce-network
 
@@ -128,12 +152,10 @@ services:
     depends_on:
       order-service-db:
         condition: service_healthy
+      consul:
+        condition: service_healthy
     env_file:
       - ./services/order-service/.env
-    environment:
-      - DB_SOURCE=postgres://postgres:postgres@order-service-db:5432/order_service_db?sslmode=disable
-      - PORT=50054
-      - JWT_SECRET_KEY=secure-secret-key
     networks:
       - ecommerce-network
 
@@ -142,6 +164,7 @@ volumes:
   product-service-db-data:
   cart-service-db-data:
   order-service-db-data:
+  consul-data:
 
 networks:
   ecommerce-network:

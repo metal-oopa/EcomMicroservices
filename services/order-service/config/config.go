@@ -8,10 +8,13 @@ import (
 )
 
 type Config struct {
-	DBSource     string
-	Port         string
-	JWTSecretKey string
-	StripeAPIKey string
+	DBSource      string
+	Port          string
+	JWTSecretKey  string
+	StripeAPIKey  string
+	ConsulAddress string
+	ServiceName   string
+	ServiceHost   string
 }
 
 func LoadConfig() *Config {
@@ -20,10 +23,13 @@ func LoadConfig() *Config {
 	}
 
 	config := &Config{
-		DBSource:     getEnv("DB_SOURCE", "postgres://postgres:postgres@localhost:5435/order_service_db?sslmode=disable"),
-		Port:         getEnv("PORT", "50054"),
-		JWTSecretKey: getEnv("JWT_SECRET_KEY", "secret"),
-		StripeAPIKey: getEnv("STRIPE_API_KEY", ""),
+		DBSource:      getEnv("DB_SOURCE", "postgres://postgres:postgres@localhost:5435/order_service_db?sslmode=disable"),
+		Port:          getEnv("PORT", "50054"),
+		JWTSecretKey:  getEnv("JWT_SECRET_KEY", "secret"),
+		StripeAPIKey:  getEnv("STRIPE_API_KEY", ""),
+		ConsulAddress: getEnv("CONSUL_ADDRESS", "consul:8500"),
+		ServiceName:   getEnv("SERVICE_NAME", "user-service"),
+		ServiceHost:   getEnv("SERVICE_HOST", "user-service"),
 	}
 
 	return config

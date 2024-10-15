@@ -4,8 +4,10 @@ import (
 	"context"
 	"strconv"
 
+	consulapi "github.com/hashicorp/consul/api"
 	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/cartpb"
 	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/models"
+	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/productpb"
 	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/repository"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -13,14 +15,18 @@ import (
 
 type CartServiceServer struct {
 	cartpb.UnimplementedCartServiceServer
-	repo         repository.CartRepository
-	jwtSecretKey string
+	repo          repository.CartRepository
+	jwtSecretKey  string
+	productClient productpb.ProductServiceClient
+	consulClient  *consulapi.Client
 }
 
-func NewCartServiceServer(repo repository.CartRepository, jwtSecretKey string) cartpb.CartServiceServer {
+func NewCartServiceServer(repo repository.CartRepository, jwtSecretKey string, consulClient *consulapi.Client, productClient productpb.ProductServiceClient) cartpb.CartServiceServer {
 	return &CartServiceServer{
-		repo:         repo,
-		jwtSecretKey: jwtSecretKey,
+		repo:          repo,
+		jwtSecretKey:  jwtSecretKey,
+		productClient: productClient,
+		consulClient:  consulClient,
 	}
 }
 

@@ -12,6 +12,9 @@ type Config struct {
 	Port          string
 	JWTSecretKey  string
 	TokenDuration string
+	ConsulAddress string
+	ServiceName   string
+	ServiceHost   string
 }
 
 func LoadConfig() *Config {
@@ -22,8 +25,11 @@ func LoadConfig() *Config {
 	config := &Config{
 		DBSource:      getEnv("DB_SOURCE", "postgres://postgres:postgres@localhost:5432/user_service_db?sslmode=disable"),
 		Port:          getEnv("PORT", "50051"),
-		JWTSecretKey:  getEnv("JWT_SECRET_KEY", "secret"),
+		JWTSecretKey:  getEnv("JWT_SECRET_KEY", "secret-key"),
 		TokenDuration: getEnv("TOKEN_DURATION", "24h"),
+		ConsulAddress: getEnv("CONSUL_ADDRESS", "consul:8500"),
+		ServiceName:   getEnv("SERVICE_NAME", "user-service"),
+		ServiceHost:   getEnv("SERVICE_HOST", "user-service"),
 	}
 
 	return config

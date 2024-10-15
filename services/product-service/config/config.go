@@ -8,8 +8,11 @@ import (
 )
 
 type Config struct {
-	DBSource string
-	Port     string
+	DBSource      string
+	Port          string
+	ConsulAddress string
+	ServiceName   string
+	ServiceHost   string
 }
 
 func LoadConfig() *Config {
@@ -18,8 +21,11 @@ func LoadConfig() *Config {
 	}
 
 	config := &Config{
-		DBSource: getEnv("DB_SOURCE", "postgres://postgres:postgres@localhost:5432/product_service_db?sslmode=disable"),
-		Port:     getEnv("PORT", "50052"),
+		DBSource:      getEnv("DB_SOURCE", "postgres://postgres:postgres@localhost:5432/product_service_db?sslmode=disable"),
+		Port:          getEnv("PORT", "50052"),
+		ConsulAddress: getEnv("CONSUL_ADDRESS", "consul:8500"),
+		ServiceName:   getEnv("SERVICE_NAME", "user-service"),
+		ServiceHost:   getEnv("SERVICE_HOST", "user-service"),
 	}
 
 	return config
