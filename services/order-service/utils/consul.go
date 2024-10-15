@@ -36,3 +36,18 @@ func RegisterServiceWithConsul(serviceName string, servicePort int, consulAddres
 	log.Printf("Registered service %s with Consul", serviceName)
 	return nil
 }
+
+func GetServiceAddress(client *consulapi.Client, serviceName string) (string, error) {
+	services, _, err := client.Health().Service(serviceName, "", true, nil)
+	if err != nil {
+		return "", fmt.Errorf("error retrieving instances from Consul: %v", err)
+	}
+
+	if len(services) == 0 {
+		return "", fmt.Errorf("no instances of service %s found", serviceName)
+	}
+
+	service := services[0].Service
+	address := fmt.Sprintf("%s:%d", service.Address, service.Port)
+	return address, nil
+}

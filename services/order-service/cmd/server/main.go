@@ -5,13 +5,16 @@ import (
 	"net"
 	"strconv"
 
+	consulapi "github.com/hashicorp/consul/api"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/config"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/db"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/handlers"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/orderpb"
+	"github.com/metal-oopa/distributed-ecommerce/services/order-service/productpb"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/repository"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/utils"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
@@ -35,7 +38,28 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 
-	orderpb.RegisterOrderServiceServer(grpcServer, handlers.NewOrderServiceServer(orderRepo, cfg.JWTSecretKey, cfg.StripeAPIKey))
+	// Consul client
+	consulConfig := consulapi.DefaultConfig()
+	consulConfig.Address = cfg.ConsulAddress
+	consulClient, err := consulapi.NewClient(consulConfig)
+	if err != nil {
+		log.Fatalf("Failed to create Consul client: %v", err)
+	}
+
+	productServiceAddress, err := utils.GetServiceAddress(consulClient, "product-service")
+	if err != nil {
+		log.Fatalf("Failed to get Product Service address: %v", err)
+	}
+
+	// gRPC connection with Product Service
+	productConn, err := grpc.NewClient(productServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to Product Service: %v", err)
+	}
+	defer productConn.Close()
+	productClient := productpb.NewProductServiceClient(productConn)
+
+	orderpb.RegisterOrderServiceServer(grpcServer, handlers.NewOrderServiceServer(orderRepo, cfg.JWTSecretKey, cfg.StripeAPIKey, consulClient, productClient))
 
 	healthServer := health.NewServer()
 	grpc_health_v1.RegisterHealthServer(grpcServer, healthServer)

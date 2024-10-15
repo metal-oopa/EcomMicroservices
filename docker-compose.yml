@@ -154,6 +154,8 @@ services:
         condition: service_healthy
       consul:
         condition: service_healthy
+      product-service:
+        condition: service_healthy
     env_file:
       - ./services/order-service/.env
     networks:

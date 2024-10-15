@@ -6,8 +6,10 @@ import (
 	"strconv"
 	"time"
 
+	consulapi "github.com/hashicorp/consul/api"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/models"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/orderpb"
+	productpb "github.com/metal-oopa/distributed-ecommerce/services/order-service/productpb"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/repository"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/utils"
 	"google.golang.org/grpc/codes"
@@ -16,18 +18,22 @@ import (
 
 type OrderServiceServer struct {
 	orderpb.UnimplementedOrderServiceServer
-	repo         repository.OrderRepository
-	jwtSecretKey string
-	stripeAPIKey string
+	repo          repository.OrderRepository
+	jwtSecretKey  string
+	stripeAPIKey  string
+	consulClient  *consulapi.Client
+	productClient productpb.ProductServiceClient
 }
 
-func NewOrderServiceServer(repo repository.OrderRepository, jwtSecretKey, stripeAPIKey string) orderpb.OrderServiceServer {
+func NewOrderServiceServer(repo repository.OrderRepository, jwtSecretKey, stripeAPIKey string, consulClient *consulapi.Client, productClient productpb.ProductServiceClient) orderpb.OrderServiceServer {
 	utils.InitializeStripe(stripeAPIKey)
 
 	return &OrderServiceServer{
-		repo:         repo,
-		jwtSecretKey: jwtSecretKey,
-		stripeAPIKey: stripeAPIKey,
+		repo:          repo,
+		jwtSecretKey:  jwtSecretKey,
+		stripeAPIKey:  stripeAPIKey,
+		consulClient:  consulClient,
+		productClient: productClient,
 	}
 }
 
@@ -41,13 +47,44 @@ func (s *OrderServiceServer) CreateOrder(ctx context.Context, req *orderpb.Creat
 		return nil, status.Errorf(codes.InvalidArgument, "invalid user ID")
 	}
 
-	// Calculate total amount
+	// product prices from Product Service
 	var totalAmount float64
+	var orderItems []models.OrderItem
+
 	for _, item := range req.Items {
-		// TODO: fetch the product price from the Product Service
-		totalAmount += 10.0 * float64(item.Quantity)
+		productID, err := strconv.Atoi(item.ProductId)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid product ID")
+		}
+
+		productResp, err := s.productClient.GetProduct(ctx, &productpb.GetProductRequest{
+			ProductId: item.ProductId,
+		})
+		if err != nil {
+			grpcErr, ok := status.FromError(err)
+			if ok && grpcErr.Code() == codes.NotFound {
+				return nil, status.Errorf(codes.InvalidArgument, "product not found")
+			}
+			return nil, status.Errorf(codes.Internal, "failed to fetch product: %v", err)
+		}
+
+		product := productResp.Product
+
+		if product.Quantity < item.Quantity {
+			return nil, status.Errorf(codes.InvalidArgument, "product %s is out of stock", product.Name)
+		}
+
+		itemTotal := product.Price * float64(item.Quantity)
+		totalAmount += itemTotal
+
+		orderItem := models.OrderItem{
+			ProductID: productID,
+			Quantity:  item.Quantity,
+		}
+		orderItems = append(orderItems, orderItem)
 	}
 
+	// Process payment with Stripe
 	amountInCents := int64(totalAmount * 100) // Convert to cents
 	_, err = utils.CreatePaymentIntent(amountInCents, "usd", req.PaymentMethodId)
 	if err != nil {
@@ -59,19 +96,7 @@ func (s *OrderServiceServer) CreateOrder(ctx context.Context, req *orderpb.Creat
 		TotalAmount: totalAmount,
 		Status:      "Confirmed",
 		CreatedAt:   time.Now(),
-	}
-
-	for _, item := range req.Items {
-		productID, err := strconv.Atoi(item.ProductId)
-		if err != nil {
-			return nil, status.Errorf(codes.InvalidArgument, "invalid product ID")
-		}
-
-		orderItem := models.OrderItem{
-			ProductID: productID,
-			Quantity:  item.Quantity,
-		}
-		order.Items = append(order.Items, orderItem)
+		Items:       orderItems,
 	}
 
 	err = s.repo.CreateOrder(ctx, order)
