@@ -18,7 +18,6 @@ message CartItem {
 }
 
 message AddItemRequest {
-  string user_id = 1;
   string product_id = 2;
   int32 quantity = 3;
 }
@@ -28,7 +27,6 @@ message AddItemResponse {
 }
 
 message GetCartRequest {
-  string user_id = 1;
 }
 
 message GetCartResponse {
@@ -36,7 +34,6 @@ message GetCartResponse {
 }
 
 message UpdateItemQuantityRequest {
-  string user_id = 1;
   string product_id = 2;
   int32 quantity = 3;
 }
@@ -46,7 +43,6 @@ message UpdateItemQuantityResponse {
 }
 
 message RemoveItemRequest {
-  string user_id = 1;
   string product_id = 2;
 }
 
@@ -55,7 +51,6 @@ message RemoveItemResponse {
 }
 
 message ClearCartRequest {
-  string user_id = 1;
 }
 
 message ClearCartResponse {

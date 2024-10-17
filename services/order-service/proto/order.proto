@@ -25,7 +25,6 @@ message Order {
 }
 
 message CreateOrderRequest {
-  string user_id = 1;
   repeated OrderItem items = 2;
   string payment_method_id = 3;
 }
@@ -43,7 +42,6 @@ message GetOrderResponse {
 }
 
 message ListOrdersRequest {
-  string user_id = 1;
 }
 
 message ListOrdersResponse {

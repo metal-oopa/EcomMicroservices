@@ -35,8 +35,8 @@ func TestRegisterUser(t *testing.T) {
 		t.Errorf("RegisterUser failed: %v", err)
 	}
 
-	if resp.User.UserId != "1" {
-		t.Errorf("Expected UserId '1', got '%s'", resp.User.UserId)
+	if resp.User.Username != req.Username {
+		t.Errorf("Expected UserId '1', got '%s'", resp.User.Username)
 	}
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("Unfulfilled expectations: %v", err)

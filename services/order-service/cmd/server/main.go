@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	consulapi "github.com/hashicorp/consul/api"
+	"github.com/metal-oopa/distributed-ecommerce/services/order-service/auth"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/config"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/db"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/handlers"
@@ -36,7 +37,7 @@ func main() {
 		log.Fatalf("Failed to listen on port %s: %v", cfg.Port, err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(auth.UnaryAuthInterceptor(cfg.JWTSecretKey)))
 
 	// Consul client
 	consulConfig := consulapi.DefaultConfig()

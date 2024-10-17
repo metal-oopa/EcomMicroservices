@@ -4,13 +4,16 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/metal-oopa/distributed-ecommerce/services/user-service/auth"
 )
 
-func GenerateJWT(secretKey string, userID int, duration time.Duration) (string, error) {
-	claims := &jwt.RegisteredClaims{
-		Subject:   string(userID),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration)),
-		IssuedAt:  jwt.NewNumericDate(time.Now()),
+func GenerateJWT(userID int, secretKey string, duration time.Duration) (string, error) {
+	claims := &auth.AuthClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+		UserID: userID,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

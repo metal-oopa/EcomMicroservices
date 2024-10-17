@@ -22,6 +22,7 @@ func RegisterServiceWithConsul(serviceName string, servicePort int, consulAddres
 	registration.Name = serviceName
 	registration.Address = os.Getenv("SERVICE_HOST")
 	registration.Port = servicePort
+	registration.Tags = []string{"cart-service"}
 	registration.Check = &consulapi.AgentServiceCheck{
 		GRPC:                           fmt.Sprintf("%s:%d/%s", registration.Address, servicePort, serviceName),
 		Interval:                       "10s",

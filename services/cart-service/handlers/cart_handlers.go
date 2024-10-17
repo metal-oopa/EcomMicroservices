@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	consulapi "github.com/hashicorp/consul/api"
+	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/auth"
 	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/cartpb"
 	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/models"
 	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/productpb"
@@ -31,9 +32,10 @@ func NewCartServiceServer(repo repository.CartRepository, jwtSecretKey string, c
 }
 
 func (s *CartServiceServer) AddItem(ctx context.Context, req *cartpb.AddItemRequest) (*cartpb.AddItemResponse, error) {
-	userID, err := strconv.Atoi(req.UserId)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid user ID")
+	userID, ok := ctx.Value(auth.UserIDKey).(int)
+
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid user ID")
 	}
 
 	if req.ProductId == "" || req.Quantity <= 0 {
@@ -62,9 +64,10 @@ func (s *CartServiceServer) AddItem(ctx context.Context, req *cartpb.AddItemRequ
 }
 
 func (s *CartServiceServer) GetCart(ctx context.Context, req *cartpb.GetCartRequest) (*cartpb.GetCartResponse, error) {
-	userID, err := strconv.Atoi(req.UserId)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid user ID")
+	userID, ok := ctx.Value(auth.UserIDKey).(int)
+
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid user ID")
 	}
 
 	items, err := s.repo.GetCart(ctx, userID)
@@ -86,9 +89,10 @@ func (s *CartServiceServer) GetCart(ctx context.Context, req *cartpb.GetCartRequ
 }
 
 func (s *CartServiceServer) UpdateItemQuantity(ctx context.Context, req *cartpb.UpdateItemQuantityRequest) (*cartpb.UpdateItemQuantityResponse, error) {
-	userID, err := strconv.Atoi(req.UserId)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid user ID")
+	userID, ok := ctx.Value(auth.UserIDKey).(int)
+
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid user ID")
 	}
 
 	productID, err := strconv.Atoi(req.ProductId)
@@ -120,9 +124,10 @@ func (s *CartServiceServer) UpdateItemQuantity(ctx context.Context, req *cartpb.
 }
 
 func (s *CartServiceServer) RemoveItem(ctx context.Context, req *cartpb.RemoveItemRequest) (*cartpb.RemoveItemResponse, error) {
-	userID, err := strconv.Atoi(req.UserId)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid user ID")
+	userID, ok := ctx.Value(auth.UserIDKey).(int)
+
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid user ID")
 	}
 
 	productID, err := strconv.Atoi(req.ProductId)
@@ -144,12 +149,13 @@ func (s *CartServiceServer) RemoveItem(ctx context.Context, req *cartpb.RemoveIt
 }
 
 func (s *CartServiceServer) ClearCart(ctx context.Context, req *cartpb.ClearCartRequest) (*cartpb.ClearCartResponse, error) {
-	userID, err := strconv.Atoi(req.UserId)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid user ID")
+	userID, ok := ctx.Value(auth.UserIDKey).(int)
+
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid user ID")
 	}
 
-	err = s.repo.ClearCart(ctx, userID)
+	err := s.repo.ClearCart(ctx, userID)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to clear cart: %v", err)
 	}

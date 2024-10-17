@@ -56,7 +56,6 @@ func (s *UserServiceServer) RegisterUser(ctx context.Context, req *userpb.Regist
 
 	return &userpb.RegisterUserResponse{
 		User: &userpb.User{
-			UserId:   strconv.Itoa(user.UserID),
 			Username: user.Username,
 			Email:    user.Email,
 		},
@@ -77,7 +76,7 @@ func (s *UserServiceServer) LoginUser(ctx context.Context, req *userpb.LoginUser
 		return nil, status.Errorf(codes.Unauthenticated, "invalid credentials")
 	}
 
-	token, err := utils.GenerateJWT(s.jwtSecretKey, user.UserID, s.tokenDuration)
+	token, err := utils.GenerateJWT(user.UserID, s.jwtSecretKey, s.tokenDuration)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to generate token")
 	}
@@ -88,7 +87,8 @@ func (s *UserServiceServer) LoginUser(ctx context.Context, req *userpb.LoginUser
 }
 
 func (s *UserServiceServer) GetUserProfile(ctx context.Context, req *userpb.GetUserProfileRequest) (*userpb.GetUserProfileResponse, error) {
-	userID, err := strconv.Atoi(req.UserId)
+	userIDStr := ctx.Value("userID").(string)
+	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid user ID")
 	}
@@ -100,7 +100,6 @@ func (s *UserServiceServer) GetUserProfile(ctx context.Context, req *userpb.GetU
 
 	return &userpb.GetUserProfileResponse{
 		User: &userpb.User{
-			UserId:   strconv.Itoa(user.UserID),
 			Username: user.Username,
 			Email:    user.Email,
 		},

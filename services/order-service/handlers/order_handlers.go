@@ -7,6 +7,7 @@ import (
 	"time"
 
 	consulapi "github.com/hashicorp/consul/api"
+	"github.com/metal-oopa/distributed-ecommerce/services/order-service/auth"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/models"
 	"github.com/metal-oopa/distributed-ecommerce/services/order-service/orderpb"
 	productpb "github.com/metal-oopa/distributed-ecommerce/services/order-service/productpb"
@@ -42,9 +43,10 @@ func (s *OrderServiceServer) CreateOrder(ctx context.Context, req *orderpb.Creat
 		return nil, status.Errorf(codes.InvalidArgument, "items and payment method are required")
 	}
 
-	userID, err := strconv.Atoi(req.UserId)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid user ID")
+	userID, ok := ctx.Value(auth.UserIDKey).(int)
+
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid user ID")
 	}
 
 	// product prices from Product Service
@@ -86,7 +88,7 @@ func (s *OrderServiceServer) CreateOrder(ctx context.Context, req *orderpb.Creat
 
 	// Process payment with Stripe
 	amountInCents := int64(totalAmount * 100) // Convert to cents
-	_, err = utils.CreatePaymentIntent(amountInCents, "usd", req.PaymentMethodId)
+	_, err := utils.CreatePaymentIntent(amountInCents, "usd", req.PaymentMethodId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "payment failed: %v", err)
 	}
@@ -129,9 +131,10 @@ func (s *OrderServiceServer) GetOrder(ctx context.Context, req *orderpb.GetOrder
 }
 
 func (s *OrderServiceServer) ListOrders(ctx context.Context, req *orderpb.ListOrdersRequest) (*orderpb.ListOrdersResponse, error) {
-	userID, err := strconv.Atoi(req.UserId)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid user ID")
+	userID, ok := ctx.Value(auth.UserIDKey).(int)
+
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid user ID")
 	}
 
 	orders, err := s.repo.ListOrdersByUserID(ctx, userID)

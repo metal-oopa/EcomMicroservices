@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	consulapi "github.com/hashicorp/consul/api"
+	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/auth"
 	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/cartpb"
 	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/config"
 	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/db"
@@ -43,7 +44,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create Consul client: %v", err)
 	}
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(auth.UnaryAuthInterceptor(cfg.JWTSecretKey)))
 
 	productServiceAddress, err := utils.GetServiceAddress(consulClient, "product-service")
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/metal-oopa/distributed-ecommerce/services/user-service/auth"
 	"github.com/metal-oopa/distributed-ecommerce/services/user-service/config"
 	"github.com/metal-oopa/distributed-ecommerce/services/user-service/db"
 	"github.com/metal-oopa/distributed-ecommerce/services/user-service/handlers"
@@ -40,7 +41,7 @@ func main() {
 		log.Fatalf("Failed to listen on port %s: %v", cfg.Port, err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(auth.UnaryAuthInterceptor(cfg.JWTSecretKey)))
 
 	userpb.RegisterUserServiceServer(grpcServer, handlers.NewUserServiceServer(userRepo, cfg.JWTSecretKey, tokenDuration))
 
