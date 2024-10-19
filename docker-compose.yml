@@ -19,10 +19,8 @@ services:
 
   user-service-db:
     image: postgres:latest
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=user_service_db
+    env_file:
+      - ./services/user-service/db/.env
     ports:
       - "5432:5432"
     volumes:
@@ -55,10 +53,8 @@ services:
 
   product-service-db:
     image: postgres:latest
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=product_service_db
+    env_file:
+      - ./services/product-service/db/.env
     ports:
       - "5433:5432"
     volumes:
@@ -96,10 +92,8 @@ services:
 
   cart-service-db:
     image: postgres:latest
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=cart_service_db
+    env_file:
+      - ./services/cart-service/db/.env
     ports:
       - "5434:5432"
     volumes:
@@ -134,10 +128,8 @@ services:
 
   order-service-db:
     image: postgres:latest
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=order_service_db
+    env_file:
+      - ./services/order-service/db/.env
     ports:
       - "5435:5432"
     volumes:
