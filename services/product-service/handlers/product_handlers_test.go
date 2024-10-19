@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/metal-oopa/distributed-ecommerce/services/product-service/productpb"
-	"github.com/metal-oopa/distributed-ecommerce/services/product-service/repository"
+	"github.com/metal-oopa/EcomMicroservices/services/product-service/productpb"
+	"github.com/metal-oopa/EcomMicroservices/services/product-service/repository"
 )
 
 func TestCreateProduct(t *testing.T) {

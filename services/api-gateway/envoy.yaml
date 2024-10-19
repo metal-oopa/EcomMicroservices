@@ -1,0 +1,116 @@
+static_resources:
+  listeners:
+    - name: listener_grpc
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 8080
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: ingress_grpc
+                http2_protocol_options: {}
+                route_config:
+                  name: local_route
+                  virtual_hosts:
+                    - name: product_service
+                      domains:
+                        - "product-service"
+                      routes:
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: product-service
+                    - name: user_service
+                      domains:
+                        - "user-service"
+                      routes:
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: user-service
+                    - name: cart_service
+                      domains:
+                        - "cart-service"
+                      routes:
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: cart-service
+                    - name: order_service
+                      domains:
+                        - "order-service"
+                      routes:
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: order-service
+                http_filters:
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+  clusters:
+    - name: product-service
+      connect_timeout: 0.5s
+      type: logical_dns
+      lb_policy: round_robin
+      http2_protocol_options: {}
+      load_assignment:
+        cluster_name: product-service
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: product-service
+                      port_value: 50052
+    - name: user-service
+      connect_timeout: 0.5s
+      type: logical_dns
+      lb_policy: round_robin
+      http2_protocol_options: {}
+      load_assignment:
+        cluster_name: user-service
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: user-service
+                      port_value: 50051
+    - name: cart-service
+      connect_timeout: 0.5s
+      type: logical_dns
+      lb_policy: round_robin
+      http2_protocol_options: {}
+      load_assignment:
+        cluster_name: cart-service
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: cart-service
+                      port_value: 50053
+    - name: order-service
+      connect_timeout: 0.5s
+      type: logical_dns
+      lb_policy: round_robin
+      http2_protocol_options: {}
+      load_assignment:
+        cluster_name: order-service
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: order-service
+                      port_value: 50054
+admin:
+  access_log_path: /dev/null
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 9901 # Admin interface

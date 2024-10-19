@@ -50,6 +50,11 @@ services:
     restart: always
     networks:
       - ecommerce-network
+    healthcheck:
+      test: ["CMD", "ping", "-c", "1", "user-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   product-service-db:
     image: postgres:latest
@@ -125,6 +130,11 @@ services:
     restart: always
     networks:
       - ecommerce-network
+    healthcheck:
+      test: ["CMD", "ping", "-c", "1", "cart-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   order-service-db:
     image: postgres:latest
@@ -161,6 +171,34 @@ services:
     restart: always
     networks:
       - ecommerce-network
+    healthcheck:
+      test: ["CMD", "ping", "-c", "1", "order-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api-gateway:
+    image: envoyproxy/envoy-distroless:v1.31-latest
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    volumes:
+      - ./services/api-gateway/envoy.yaml:/etc/envoy/envoy.yaml
+    depends_on:
+      consul:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
+      cart-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+    restart: always
 
 volumes:
   user-service-db-data:

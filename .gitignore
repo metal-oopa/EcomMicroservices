@@ -17,5 +17,3 @@
 # env
 .env
 .env.*
-
-/services/api-gateway/

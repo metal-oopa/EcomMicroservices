@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/metal-oopa/distributed-ecommerce/services/user-service/models"
-	"github.com/metal-oopa/distributed-ecommerce/services/user-service/repository"
-	"github.com/metal-oopa/distributed-ecommerce/services/user-service/userpb"
-	"github.com/metal-oopa/distributed-ecommerce/services/user-service/utils"
+	"github.com/metal-oopa/EcomMicroservices/services/user-service/models"
+	"github.com/metal-oopa/EcomMicroservices/services/user-service/repository"
+	"github.com/metal-oopa/EcomMicroservices/services/user-service/userpb"
+	"github.com/metal-oopa/EcomMicroservices/services/user-service/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

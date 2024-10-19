@@ -1,4 +1,4 @@
-module github.com/metal-oopa/distributed-ecommerce/services/order-service
+module github.com/metal-oopa/EcomMicroservices/services/order-service
 
 go 1.23.1
 

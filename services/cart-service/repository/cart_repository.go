@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/models"
+	"github.com/metal-oopa/EcomMicroservices/services/cart-service/models"
 )
 
 type CartRepository interface {

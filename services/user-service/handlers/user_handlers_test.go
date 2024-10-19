@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/metal-oopa/distributed-ecommerce/services/user-service/repository"
-	"github.com/metal-oopa/distributed-ecommerce/services/user-service/userpb"
+	"github.com/metal-oopa/EcomMicroservices/services/user-service/repository"
+	"github.com/metal-oopa/EcomMicroservices/services/user-service/userpb"
 )
 
 func TestRegisterUser(t *testing.T) {

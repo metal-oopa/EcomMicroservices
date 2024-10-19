@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/metal-oopa/distributed-ecommerce/services/user-service/models"
+	"github.com/metal-oopa/EcomMicroservices/services/user-service/models"
 )
 
 type UserRepository interface {

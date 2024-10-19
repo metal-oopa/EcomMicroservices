@@ -1,4 +1,4 @@
-module github.com/metal-oopa/distributed-ecommerce/services/product-service
+module github.com/metal-oopa/EcomMicroservices/services/product-service
 
 go 1.23.1
 
@@ -14,7 +14,6 @@ require (
 require (
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/fatih/color v1.16.0 // indirect
-	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect

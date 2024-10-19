@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/metal-oopa/distributed-ecommerce/services/product-service/models"
+	"github.com/metal-oopa/EcomMicroservices/services/product-service/models"
 )
 
 type ProductRepository interface {

@@ -1,4 +1,4 @@
-module github.com/metal-oopa/distributed-ecommerce/services/cart-service
+module github.com/metal-oopa/EcomMicroservices/services/cart-service
 
 go 1.23.1
 

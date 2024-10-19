@@ -1,4 +1,4 @@
-module github.com/metal-oopa/distributed-ecommerce/services/user-service
+module github.com/metal-oopa/EcomMicroservices/services/user-service
 
 go 1.23.1
 

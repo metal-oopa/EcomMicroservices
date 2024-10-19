@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/metal-oopa/distributed-ecommerce/services/order-service/models"
+	"github.com/metal-oopa/EcomMicroservices/services/order-service/models"
 )
 
 type OrderRepository interface {

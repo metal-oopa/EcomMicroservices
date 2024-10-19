@@ -5,11 +5,11 @@ import (
 	"strconv"
 
 	consulapi "github.com/hashicorp/consul/api"
-	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/auth"
-	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/cartpb"
-	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/models"
-	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/productpb"
-	"github.com/metal-oopa/distributed-ecommerce/services/cart-service/repository"
+	"github.com/metal-oopa/EcomMicroservices/services/cart-service/auth"
+	"github.com/metal-oopa/EcomMicroservices/services/cart-service/cartpb"
+	"github.com/metal-oopa/EcomMicroservices/services/cart-service/models"
+	"github.com/metal-oopa/EcomMicroservices/services/cart-service/productpb"
+	"github.com/metal-oopa/EcomMicroservices/services/cart-service/repository"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

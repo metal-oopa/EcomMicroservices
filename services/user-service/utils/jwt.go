@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/metal-oopa/distributed-ecommerce/services/user-service/auth"
+	"github.com/metal-oopa/EcomMicroservices/services/user-service/auth"
 )
 
 func GenerateJWT(userID int, secretKey string, duration time.Duration) (string, error) {

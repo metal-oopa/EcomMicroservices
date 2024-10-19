@@ -4,9 +4,9 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/metal-oopa/distributed-ecommerce/services/product-service/models"
-	"github.com/metal-oopa/distributed-ecommerce/services/product-service/productpb"
-	"github.com/metal-oopa/distributed-ecommerce/services/product-service/repository"
+	"github.com/metal-oopa/EcomMicroservices/services/product-service/models"
+	"github.com/metal-oopa/EcomMicroservices/services/product-service/productpb"
+	"github.com/metal-oopa/EcomMicroservices/services/product-service/repository"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

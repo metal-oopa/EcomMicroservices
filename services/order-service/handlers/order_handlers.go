@@ -7,12 +7,12 @@ import (
 	"time"
 
 	consulapi "github.com/hashicorp/consul/api"
-	"github.com/metal-oopa/distributed-ecommerce/services/order-service/auth"
-	"github.com/metal-oopa/distributed-ecommerce/services/order-service/models"
-	"github.com/metal-oopa/distributed-ecommerce/services/order-service/orderpb"
-	productpb "github.com/metal-oopa/distributed-ecommerce/services/order-service/productpb"
-	"github.com/metal-oopa/distributed-ecommerce/services/order-service/repository"
-	"github.com/metal-oopa/distributed-ecommerce/services/order-service/utils"
+	"github.com/metal-oopa/EcomMicroservices/services/order-service/auth"
+	"github.com/metal-oopa/EcomMicroservices/services/order-service/models"
+	"github.com/metal-oopa/EcomMicroservices/services/order-service/orderpb"
+	productpb "github.com/metal-oopa/EcomMicroservices/services/order-service/productpb"
+	"github.com/metal-oopa/EcomMicroservices/services/order-service/repository"
+	"github.com/metal-oopa/EcomMicroservices/services/order-service/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
